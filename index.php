@@ -1,3 +1,37 @@
+<?php 
+session_start();
+include 'db.php'; // Ensure 'db.php' connects to your database
+
+// Handle login form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $role = $_POST['role'];
+
+    if ($role === 'client') {
+        $query = "SELECT * FROM clients WHERE email = '$email' AND password = '$password'";
+    } elseif ($role === 'admin') {
+        $query = "SELECT * FROM admins WHERE email = '$email' AND password = '$password'";
+    }
+
+    $result = $conn->query($query);
+
+    if ($result && $result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        $_SESSION['name'] = $user['name'];
+        $_SESSION['role'] = $role;
+
+        if ($role === 'client') {
+            header("Location: dashboard-client.php");
+        } else {
+            header("Location: dashboard-admin.php");
+        }
+        exit;
+    } else {
+        $loginError = "Invalid email or password.";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -114,6 +148,11 @@
         padding: 15px;
         font-size: 14px;
     }
+
+    .error {
+        color: red;
+        margin-bottom: 10px;
+    }
     </style>
     <script>
     function showLoginForm(type) {
@@ -137,10 +176,16 @@
             <button onclick="showLoginForm('client')">Login as Client</button>
         </div>
 
-        <form id="admin-login" class="login-form" action="php/admin_login.php" method="POST">
+        <?php if (!empty($loginError)) : ?>
+        <div class="error"><?= $loginError ?></div>
+        <?php endif; ?>
+
+        <!-- Admin Login Form -->
+        <form id="admin-login" class="login-form" method="POST">
             <h2>Admin Login</h2>
-            <label for="admin-username">Username</label>
-            <input type="text" id="admin-username" name="username" placeholder="Enter your username" required>
+            <input type="hidden" name="role" value="admin">
+            <label for="admin-email">Email</label>
+            <input type="email" id="admin-email" name="email" placeholder="Enter your email" required>
 
             <label for="admin-password">Password</label>
             <input type="password" id="admin-password" name="password" placeholder="Enter your password" required>
@@ -148,10 +193,12 @@
             <button type="submit">Login</button>
         </form>
 
-        <form id="client-login" class="login-form" action="php/client_login.php" method="POST">
+        <!-- Client Login Form -->
+        <form id="client-login" class="login-form" method="POST">
             <h2>Client Login</h2>
-            <label for="client-username">Username</label>
-            <input type="text" id="client-username" name="username" placeholder="Enter your username" required>
+            <input type="hidden" name="role" value="client">
+            <label for="client-email">Email</label>
+            <input type="email" id="client-email" name="email" placeholder="Enter your email" required>
 
             <label for="client-password">Password</label>
             <input type="password" id="client-password" name="password" placeholder="Enter your password" required>
