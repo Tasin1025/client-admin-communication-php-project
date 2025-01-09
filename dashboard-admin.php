@@ -1,3 +1,33 @@
+<?php
+session_start();
+include 'db.php';
+
+// Check if the user is logged in and has the 'admin' role
+if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'admin') {
+    header("Location: index.php");
+    exit;
+}
+
+// Fetch clients from the database
+$clients = [];
+$query = "SELECT * FROM clients";
+$result = $conn->query($query);
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $clients[] = $row;
+    }
+}
+
+// Handle client deletion
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_client_id'])) {
+    $clientId = $_POST['delete_client_id'];
+    $deleteQuery = "DELETE FROM clients WHERE id = $clientId";
+    $conn->query($deleteQuery);
+    header("Location: dashboard-admin.php"); // Refresh the page after deletion
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -210,9 +240,18 @@
 
 <body>
     <header>
+        <div class="user-info" style="float: left; color: white; font-size: 25px; font-weight: bold;">
+            Welcome, <?= htmlspecialchars($_SESSION['name']); ?>
+
+        </div>
+        <form action="logout.php" method="POST" style="float: right;">
+            <button type="submit"
+                style="background-color: #8B0000; color: white; border: solid 2px white; padding: 10px 15px; cursor: pointer;">Logout</button>
+        </form>
         <div class="logo">
             <img src="logo.jpeg" alt="Windmill Advertising Limited">
         </div>
+
     </header>
 
     <div class="container">
@@ -234,10 +273,16 @@
                 <h3>Manage Clients</h3>
                 <button onclick="window.location.href='php/add_client.php'">Add Client</button>
                 <ul>
-                    <!-- List of Clients -->
-                    <li>Client 1 <button>Delete</button></li>
-                    <li>Client 2 <button>Delete</button></li>
-                    <!-- Add more client management here -->
+                    <?php foreach ($clients as $client) : ?>
+                    <li>
+                        <?= htmlspecialchars($client['name']); ?> (<?= htmlspecialchars($client['email']); ?>)
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="delete_client_id" value="<?= $client['id']; ?>">
+                            <button type="submit"
+                                style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer;">Delete</button>
+                        </form>
+                    </li>
+                    <?php endforeach; ?>
                 </ul>
             </section>
 

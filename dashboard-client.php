@@ -1,3 +1,14 @@
+<?php
+session_start();
+include 'db.php';
+
+// Check if the user is logged in and has the 'client' role
+if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'client') {
+    header("Location: index.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -209,9 +220,18 @@
 
 <body>
     <header>
+        <div class="user-info" style="float: left; color: white; font-size: 25px; font-weight: bold;">
+            Welcome, <?= htmlspecialchars($_SESSION['name']); ?>
+
+        </div>
+        <form action="logout.php" method="POST" style="float: right;">
+            <button type="submit"
+                style="background-color: #8B0000; color: white; border: solid 2px white; padding: 10px 15px; cursor: pointer;">Logout</button>
+        </form>
         <div class="logo">
             <img src="logo.jpeg" alt="Windmill Advertising Limited">
         </div>
+
     </header>
 
     <div class="container">
