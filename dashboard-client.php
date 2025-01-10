@@ -54,7 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['query'])) {
 
     header {
         background-color: #8B0000;
-        /* Dark Red */
         padding: 20px;
         text-align: center;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -129,7 +128,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['query'])) {
 
     .dashboard-content h2 {
         color: #8B0000;
-        /* Dark Red */
         font-size: 32px;
         font-weight: bold;
         margin-bottom: 30px;
@@ -144,14 +142,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['query'])) {
         color: #333;
         font-weight: bold;
         border-bottom: 2px solid #8B0000;
-        /* Dark Red underline */
         padding-bottom: 5px;
         margin-bottom: 20px;
     }
 
     button {
         background-color: #8B0000;
-        /* Dark Red */
         color: white;
         padding: 12px 20px;
         border: none;
@@ -180,7 +176,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['query'])) {
 
     textarea:focus {
         border-color: #8B0000;
-        /* Dark Red */
         outline: none;
     }
 

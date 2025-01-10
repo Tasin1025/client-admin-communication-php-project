@@ -1,6 +1,6 @@
 <?php 
 session_start();
-include 'db.php'; // Ensure 'db.php' connects to your database
+include 'db.php'; 
 
 // Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -41,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login - Windmill Advertising</title>
     <link rel="icon" type="image/x-icon" href="logo.jpeg">
     <style>
-    /* General Reset and Layout */
     body,
     html {
         margin: 0;

@@ -77,7 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_query_id'])) {
     <title>Admin Dashboard - Windmill Advertising</title>
     <link rel="icon" type="image/x-icon" href="logo.jpeg">
     <style>
-    /* Same style as client dashboard */
     body {
         font-family: 'Arial', sans-serif;
         margin: 0;
