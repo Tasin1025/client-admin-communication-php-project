@@ -7,6 +7,26 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'client') {
     header("Location: index.php");
     exit;
 }
+
+// Fetch the latest 3 updates from the database
+$updates = [];
+$updateQuery = "SELECT content FROM updates ORDER BY created_at DESC LIMIT 3";
+$result = $conn->query($updateQuery);
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $updates[] = $row['content'];
+    }
+}
+
+// Handle query submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['query'])) {
+    $clientName = $_SESSION['name'];
+    $queryContent = $conn->real_escape_string($_POST['query']);
+    $insertQuery = "INSERT INTO queries (client_name, query, created_at) VALUES ('$clientName', '$queryContent', NOW())";
+    $conn->query($insertQuery);
+    header("Location: dashboard-client.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -24,6 +44,12 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'client') {
         padding: 0;
         background-color: #f4f4f4;
         color: #333;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    body.loaded {
+        opacity: 1;
     }
 
     header {
@@ -132,12 +158,12 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'client') {
         cursor: pointer;
         font-size: 16px;
         border-radius: 5px;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
     button:hover {
-        background-color: #a30000;
-        /* Lighter red */
+        background-color: #a83232;
+        transform: scale(1.05);
     }
 
     textarea {
@@ -190,6 +216,16 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'client') {
         /* Darker green */
     }
 
+    li {
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    li:hover {
+        background-color: #f0f0f0;
+        transform: translateX(10px);
+    }
+
+
     @media (max-width: 768px) {
         .container {
             flex-direction: column;
@@ -222,7 +258,6 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'client') {
     <header>
         <div class="user-info" style="float: left; color: white; font-size: 25px; font-weight: bold;">
             Welcome, <?= htmlspecialchars($_SESSION['name']); ?>
-
         </div>
         <form action="logout.php" method="POST" style="float: right;">
             <button type="submit"
@@ -231,7 +266,6 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'client') {
         <div class="logo">
             <img src="logo.jpeg" alt="Windmill Advertising Limited">
         </div>
-
     </header>
 
     <div class="container">
@@ -251,15 +285,15 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'client') {
             <section class="updates">
                 <h3>Latest Updates</h3>
                 <ul>
-                    <li>Update 1: New service announcement.</li>
-                    <li>Update 2: Event for project launch.</li>
-                    <!-- Add more updates here -->
+                    <?php foreach ($updates as $update): ?>
+                    <li><?= htmlspecialchars($update); ?></li>
+                    <?php endforeach; ?>
                 </ul>
             </section>
 
             <section class="post-query">
                 <h3>Post a Query</h3>
-                <form action="php/post_query.php" method="POST">
+                <form action="" method="POST">
                     <textarea name="query" placeholder="Leave your comment or question" required></textarea>
                     <button type="submit">Submit Query</button>
                 </form>
@@ -271,5 +305,10 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] !== 'client') {
         <p>&copy; 2024 Windmill Advertising Limited</p>
     </footer>
 </body>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.body.classList.add("loaded");
+});
+</script>
 
 </html>

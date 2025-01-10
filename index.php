@@ -53,6 +53,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     body {
         display: flex;
         flex-direction: column;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    body.loaded {
+        opacity: 1;
     }
 
     main {
@@ -153,6 +159,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         color: red;
         margin-bottom: 10px;
     }
+
+    button {
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+        background-color: #a83232;
+        transform: scale(1.05);
+    }
     </style>
     <script>
     function showLoginForm(type) {
@@ -211,5 +226,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>&copy; 2024 Windmill Advertising Limited</p>
     </footer>
 </body>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.body.classList.add("loaded");
+});
+</script>
 
 </html>
