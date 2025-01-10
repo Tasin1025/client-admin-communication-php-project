@@ -27,6 +27,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_client_id'])) 
     exit;
 }
 
+// Handle adding a new client
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_client'])) {
+    $name = $conn->real_escape_string($_POST['name']);
+    $email = $conn->real_escape_string($_POST['email']);
+    $password = $conn->real_escape_string($_POST['password']);
+
+    $insertQuery = "INSERT INTO clients (name, email, password) VALUES ('$name', '$email', '$password')";
+    $conn->query($insertQuery);
+    header("Location: dashboard-admin.php"); // Refresh the page after adding a client
+    exit;
+}
+
 // Fetch client queries from the database
 $queries = [];
 $query = "SELECT id, client_name, query FROM queries ORDER BY created_at DESC";
@@ -216,6 +228,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_query_id'])) {
         background-color: #f0f0f0;
         transform: translateX(10px);
     }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 85px;
+        border-radius: 8px;
+        width: 400px;
+        max-width: 90%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        position: relative;
+    }
+
+    .modal-content h3 {
+        margin-top: 0;
+        font-size: 20px;
+        text-align: center;
+        color: #8B0000;
+    }
+
+    .modal-content form input {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s;
+    }
+
+    .modal-content form input:focus {
+        border-color: #8B0000;
+        outline: none;
+    }
+
+    .modal-content form button {
+        padding: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        background-color: #8B0000;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .modal-content form button:hover {
+        background-color: #a30000;
+    }
+
+    .modal-content form .btn-cancel {
+        background-color: #ccc;
+        color: #333;
+    }
+
+    .modal-content form .btn-cancel:hover {
+        background-color: #bbb;
+    }
     </style>
 </head>
 
@@ -237,6 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_query_id'])) {
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <ul>
+                <li><a href="#">Manage Clients</a></li>
                 <li><a href="#">Post Updates</a></li>
                 <li><a href="#">View Queries</a></li>
             </ul>
@@ -247,7 +333,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_query_id'])) {
 
             <section class="client-management">
                 <h3>Manage Clients</h3>
-                <button onclick="window.location.href='php/add_client.php'">Add Client</button>
+                <button onclick="document.getElementById('addClientModal').style.display = 'flex';">Add Client</button>
                 <ul>
                     <?php foreach ($clients as $client) : ?>
                     <li style="display: flex; justify-content: space-between; align-items: center;">
@@ -298,11 +384,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_query_id'])) {
     <footer>
         <p>&copy; 2024 Windmill Advertising Limited</p>
     </footer>
+
+    <div id="addClientModal" class="modal">
+        <div class="modal-content">
+            <h3>Add Client</h3>
+            <form action="" method="POST">
+                <input type="hidden" name="add_client" value="1">
+                <input type="text" name="name" placeholder="Client Name" required>
+                <input type="email" name="email" placeholder="Client Email" required>
+                <input type="password" name="password" placeholder="Client Password" required>
+                <button type="submit">Save</button>
+                <button type="button"
+                    onclick="document.getElementById('addClientModal').style.display = 'none';">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.body.classList.add("loaded");
+    });
+
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+    </script>
 </body>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    document.body.classList.add("loaded");
-});
-</script>
 
 </html>
